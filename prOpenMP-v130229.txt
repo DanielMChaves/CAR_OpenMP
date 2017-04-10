@@ -1,0 +1,74 @@
+Melero Chaves, Daniel       v130229
+
+************
+* SESIÓN 1 *
+************
+
+Ejemplo 1: Fichero "hola.c"
+
+Ejecutamos el programa tal y como esta en secuencial, la salida que nos da este
+programa es la siguiente:
+
+    Hola mundo, soy el hilo 0
+    Fin de hola mundo, soy el hilo 0
+
+Al tratarse de una versión secuencial, solo hay un hilo de ejecución.
+
+Ejecutamos el programa tal y como esta en paralelo, la salida que nos da este
+programa es la siguiente:
+
+    Hola mundo, soy el hilo 0
+    Hola mundo, soy el hilo 1
+    Hola mundo, soy el hilo 5
+    Hola mundo, soy el hilo 2
+    Hola mundo, soy el hilo 4
+    Hola mundo, soy el hilo 3
+    Hola mundo, soy el hilo 6
+    Hola mundo, soy el hilo 7
+    Fin de hola mundo, soy el hilo 0
+
+Al tratarse de una versión paralela, se ve que hay 8 hilos en ejecución (Número
+máximo de hilos de ejecución en la máquina Triqui)
+
+Modificamos el programa para que el hilo "maestro" muestre el número de hilos
+que hay en ejecución.
+
+La versión secuencial muestra los siguientes resultados:
+
+    Hola mundo, soy el hilo 0 de 1 hilos
+    Hola mundo, soy el hilo 0
+    Fin de hola mundo, soy el hilo 0
+
+La versión paralela muestra los siguientes resultados:
+
+    Hola mundo, soy el hilo 0 de 8 hilos
+    Hola mundo, soy el hilo 0
+    Hola mundo, soy el hilo 2
+    Hola mundo, soy el hilo 1
+    Hola mundo, soy el hilo 3
+    Hola mundo, soy el hilo 6
+    Hola mundo, soy el hilo 5
+    Hola mundo, soy el hilo 7
+    Hola mundo, soy el hilo 4
+    Fin de hola mundo, soy el hilo 0
+
+Ejemplo 2: Fichero "sum-vec.tids.c"
+
+Compilamos el programa y podemos observar que no siempre da el mismo resultado,
+esto es porque al escribir en la variable sum no se hace de manera atómica.
+
+Para conseguir que los diferentes hilos de ejecución accedan de manera atómica
+a dicha variable, lo vamos a conseguir con la sentencia reduction.
+
+    #pragma omp parallel reduction(+:suma)
+
+Comprobamos y si, el acceso se hace de manera atómica y el resultado de la
+operación del bucle se hace correctamente.
+
+Ejemplo 3: Fichero "while_for.c"
+
+
+
+************
+* SESIÓN 2 *
+************
