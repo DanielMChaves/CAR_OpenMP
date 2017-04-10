@@ -1,0 +1,112 @@
+
+img_ng.c,527
+#define VAR_STACK6,135
+#define COD20167,153
+#define no_COD20158,169
+#define MAX_RECURS 11,211
+#define MAX_RECURS 13,257
+#define MAX_X 16,287
+#define MAX_Y 17,308
+tImagen *Original;Original32,596
+void leeImagenOriginal_ng(34,616
+#define PROGNAME 37,662
+void escribeImagenOriginal_ng(128,2987
+static tImagen * RGBaGris(137,3149
+int ejecutaPPAL(165,3565
+int filtRec(213,4610
+int filtRec(242,5215
+void Filtro(279,5904
+uchar FilPixel(298,6230
+void SubMatriz(310,6435
+uchar valorPixel(330,6847
+int Comp(363,7360
+
+img_ngo.c,422
+#define VAR_STACK5,79
+#define MAX_X 6,97
+#define MAX_Y 7,118
+tImagen *Original;Original22,406
+void leeImagenOriginal_ng(24,426
+#define PROGNAME 27,472
+void escribeImagenOriginal_ng(118,2797
+static tImagen * RGBaGris(127,2959
+int ejecutaPPAL(155,3375
+int filtRec(196,4191
+int filtRec(225,4788
+void Filtro(262,5469
+uchar FilPixel(281,5795
+void SubMatriz(293,6000
+uchar valorPixel(324,6565
+int Comp(356,6980
+
+prueba1.c,16
+int main(9,139
+
+prueba2.c,16
+int main(9,127
+
+prueba3.c,16
+int main(9,111
+
+pruVG.c,94
+char * FichImagen1;19,250
+int    Silent;21,289
+usage(24,317
+printhelp(31,431
+main(42,767
+
+readpng.c,439
+#  define png_jmpbuf(65,2801
+static png_structp png_ptr 69,2862
+static png_infop info_ptr 70,2897
+png_uint_32  width,72,2932
+png_uint_32  width, height;72,2932
+int  bit_depth,73,2960
+int  bit_depth, color_type;73,2960
+uch  *image_data image_data74,2988
+void readpng_version_info(77,3015
+int readpng_init(88,3351
+int readpng_get_bgcolor(155,5254
+uch *readpng_get_image(readpng_get_image207,6784
+void readpng_cleanup(293,9483
+
+write_png.c,50
+inline void setRGB(18,400
+int writeImage(37,741
+
+img_ng.h,522
+#define _IMG_NG_H_2,19
+typedef unsigned char uchar;4,39
+  uchar *imagen;imagen7,86
+  int height,8,103
+  int height, width;8,103
+  int maxHeight,9,124
+  int maxHeight, maxWidth;9,124
+  int offWidth,10,151
+  int offWidth, offImg;10,151
+  int modificada;11,175
+  int rowbytes,12,204
+  int rowbytes, channels;12,204
+} tImagen 13,230
+struct mFiltro 19,372
+  int K;20,389
+  int nucleo[nucleo21,398
+struct mFiltro 24,442
+  int K;25,459
+  int C;26,468
+  int B;27,477
+typedef struct mFiltro mFiltro_t 30,496
+
+readpng.h,256
+#  define TRUE 57,2545
+#  define FALSE 58,2562
+#  define MAX(62,2600
+#  define MIN(63,2643
+#  define Trace(67,2707
+#  define Trace(69,2779
+typedef unsigned char   uch;72,2809
+typedef unsigned short  ush;73,2838
+typedef unsigned long   ulg;74,2867
+
+write_png.h,34
+typedef unsigned char uchar;7,91
