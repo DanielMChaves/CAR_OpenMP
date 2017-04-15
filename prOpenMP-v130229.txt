@@ -169,3 +169,60 @@ Ejemplo 5: Ficheros "pi.c" y "pi_omp_vec.c"
 ************
 * SESIÓN 2 *
 ************
+
+Fichero "fibonacci.c"
+
+- Versión con omp task y taskwait: En esta versión del programa asignamos a los
+  hilos tareas para que calculen el valor n-1 y otros el valor n-2.
+
+  Esto se consigue con las siguientes sentencias en la funcion fib:
+
+      if (n < 2) return n;
+      #pragma omp task shared(x)
+      x = fib(n - 1);
+      #pragma omp task shared(y)
+      y = fib(n - 2);
+      #pragma omp taskwait
+      return (x + y);
+
+- Versión con if: En esta versión del programa expecificamos que solo se
+  paralelice el calculo de fibonacci si n es mayor que 30, en caso contrario
+  este calculo se realizara de forma secuencial.
+
+  Esto se consigue con las siguientes sentencias en la funcion fib:
+
+      if (n < 2) return n;
+      #pragma omp task shared(x) if(n > 30)
+      x = fib(n - 1);
+      #pragma omp task shared(y) if(n > 30)
+      y = fib(n - 2);
+      #pragma omp taskwait
+      return (x + y);
+
+- Versión con if y asignacion de tareas: No he conseguido realizar este apartado.
+
+- Version mixta: En esta versión del programa, hemos creado en la función fib
+  un control de flujo para controlar cuando hacer los calculos en paralelo y cuando
+  hacer los calculos en secuencial.
+
+  Esto se consigue con las siguientes sentencias en la funcion fib:
+
+      if (n < 2) return n;
+
+      if (n > 30){
+        #pragma omp task shared(x)
+        x = fib(n - 1);
+        #pragma omp task shared(y)
+        y = fib(n - 2);
+        #pragma omp taskwait
+      }
+      else {
+        x = fib(n - 1);
+        y = fib(n - 2);
+      }
+
+      return (x + y);
+
+************
+*  EXTRA   *
+************

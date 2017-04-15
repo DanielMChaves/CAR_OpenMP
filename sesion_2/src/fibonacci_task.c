@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
+#include <omp.h>
 
 /* Funcion que calcula el n-esimo termino de la serie de Fibonacci */
 
@@ -13,8 +14,11 @@ double fib(int n)
 {
   double x, y;
   if (n < 2) return n;
+  #pragma omp task shared(x)
   x = fib(n - 1);
+  #pragma omp task shared(y)
   y = fib(n - 2);
+  #pragma omp taskwait
   return (x + y);
 }
 
@@ -31,7 +35,11 @@ int main(int argc, char **argv)
 
   gettimeofday(&t, NULL);
 
-  res = fib(n);
+  #pragma omp parallel shared(res)
+  {
+    #pragma omp single
+    res = fib(n);
+  }
 
   gettimeofday(&t2, NULL);
   segundos = (((t2.tv_usec - t.tv_usec)/1000000.0f)  + (t2.tv_sec - t.tv_sec));
