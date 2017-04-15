@@ -1,9 +1,9 @@
 /*
 This program will numerically compute the integral of
 
-                  4/(1+x*x) 
-				  
-from 0 to 1.  The value of this integral is pi -- which 
+                  4/(1+x*x)
+
+from 0 to 1.  The value of this integral is pi -- which
 is great since it gives us an easy way to check the answer.
 
 The is the original sequential program.  It uses the timer
@@ -37,19 +37,21 @@ int main ()
 	int tid, nthr_priv;
 	tid = omp_get_thread_num();
 	sums[tid] = 0.0;
-	nthr_priv = omp_get_num_threads();	
-	if (tid==0)
+	nthr_priv = omp_get_num_threads();
+	if (tid == 0)
 		nthr = nthr_priv;
-	for (i=tid; i<num_steps; i=i+nthr_priv){
-		x = (i+0.5)*step;
-		sums[tid]+= 4.0/(1.0+x*x);
-	}	
+
+	#pragma omp parallel for reduction(+:x)
+	for (i = tid; i < num_steps; i = i + nthr_priv){
+		x = (i + 0.5) * step;
+		sums[tid] += 4.0/(1.0 + x * x);
+	}
 }
-	
+
 	pi = 0.0;
-	for (i=0; i<nthr; i++) 
-		pi+= sums[i] * step;
+	for (i = 0; i < nthr; i++)
+		pi += sums[i] * step;
 
 	run_time = omp_get_wtime() - start_time;
-	printf("\n pi(Sec) with %ld steps is %3.20f in %f seconds\n",num_steps, pi, run_time);
-}	  
+	printf("\n pi(Parallel) with %ld steps is %3.20f in %f seconds\n", num_steps, pi, run_time);
+}

@@ -67,7 +67,104 @@ operación del bucle se hace correctamente.
 
 Ejemplo 3: Fichero "while_for.c"
 
+Bucle que busca la primera posición que es 0 dentro de un vector, las primeras
+versiones se hacen de forma secuencial tanto con un while como con un for.
 
+Realizamos tres alternativas para paralelizar este bucle de busqueda.
+
+  - Firstprivate: Nos muestra el primer valor que tiene la variable donde vamos
+    a dar el resultado, como el valor inicial es -1 nos devuelve -1.
+  - Lastprivate: Nos muestra el último valor que tiene la variable donde vamos
+    a dar el resultado, como el último valor puede ser 25 o 50, según la ejecución
+    Nos da un resultado u otro.
+  - Reduction(min): Nos muestra el valor mínimo entre los valores posibles, en
+    este caso, es el método de paralelización correcto ya que siempre nos va a dar
+    el resultado que buscamos, 25.
+
+La comparativa de resultados de cada versión se muestra en la siguiente traza:
+
+    (While): El primer cero esta en la posicion 25
+    (For - original): El primer cero esta en la posicion 25
+    (For - firstprivate): El primer cero esta en la posicion -1
+    (For - lastprivate): El primer cero esta en la posicion {25,50}
+    (For - reduction): El primer cero esta en la posicion 25
+
+Ejemplo 4: Ficheros "mats.c" y "matc_sec.c"
+
+Al ejecutar la versión secuencial no se realizan errores ya que el hilo maestro
+realiza todos calculos.
+
+Al ejecutar la versión paralela inical se ve que los resultados son erroneos,
+esto se debe a que solo un único hilo lee el argumento de la llamada del mandato
+y ese valor solo lo conoce dicho hilo. Por esto, se inicializan mal las matrices.
+
+    matriz a
+     2.000000  3.000000  4.000000  5.000000
+     24.000000  25.000000  26.000000  27.000000
+     28.000000  29.000000  30.000000  31.000000
+     32.000000  33.000000  34.000000  35.000000
+    matriz b
+     3.000000  4.000000  5.000000  6.000000
+     25.000000  26.000000  27.000000  28.000000
+     29.000000  30.000000  31.000000  32.000000
+     33.000000  34.000000  35.000000  36.000000
+
+Solucionamos este error haciendo un correcto uso de threadprivate, copyprivate y copyin.
+
+A continuación vamos a probar los diferentes tipos de planificación, dichos
+resultados han sido obtenidosbsolo con 4 hilos de ejecución.
+
+La variable contador muestra el número de iteraciones que ha hecho cada hilo.
+
+- static: Esta planificación asigna un número fijo de bloques a cada hilo en
+  ejecución, por eso todos los hijos realizan las mismas iteraciones.
+
+    3) Hilo 0, ha realizado 2 iteraciones
+    3) Hilo 3, ha realizado 2 iteraciones
+    3) Hilo 2, ha realizado 2 iteraciones
+    3) Hilo 1, ha realizado 2 iteraciones
+    3) Hilo 4, ha realizado 0 iteraciones
+    3) Hilo 6, ha realizado 0 iteraciones
+    3) Hilo 5, ha realizado 0 iteraciones
+    3) Hilo 7, ha realizado 0 iteraciones
+
+- dynamic: Esta planificación asigna un número variable de iteraciones para cada
+  hilo, cuando un hilo termina con su iteración pide otra para acabar el proceso
+  lo antes posible. Los resultados que se muestran son un ejemplo, pueden variar.
+
+    3) Hilo 0, ha realizado 2 iteraciones
+    3) Hilo 7, ha realizado 0 iteraciones
+    3) Hilo 2, ha realizado 4 iteraciones
+    3) Hilo 1, ha realizado 0 iteraciones
+    3) Hilo 4, ha realizado 0 iteraciones
+    3) Hilo 5, ha realizado 0 iteraciones
+    3) Hilo 6, ha realizado 0 iteraciones
+    3) Hilo 3, ha realizado 2 iteraciones
+
+- guided: Esta pranificación se puede decir que es la más aleatoria, ya que siempre
+  da un resultado distinto. Los resultados que se muestran son un ejemplo,
+  pueden variar.
+
+    3) Hilo 0, ha realizado 2 iteraciones
+    3) Hilo 2, ha realizado 1 iteraciones
+    3) Hilo 4, ha realizado 0 iteraciones
+    3) Hilo 5, ha realizado 0 iteraciones
+    3) Hilo 3, ha realizado 1 iteraciones
+    3) Hilo 1, ha realizado 4 iteraciones
+    3) Hilo 6, ha realizado 0 iteraciones
+    3) Hilo 7, ha realizado 0 iteraciones
+
+Ejemplo 5: Ficheros "pi.c" y "pi_omp_vec.c"
+
+- Modificación en el paralelo: En la versión inicial tarda en calcular el número
+  pi una media de 0.715281 seconds pero paralelizando el bucle for con la
+  sentencia reduction obtenemos la siguiente media de tiempo 0.598291 seconds.
+  Como se puede ver, la mejora es notable.
+
+- Modificación en el secuencial: En la versión inicial tarda en calcular el número
+  pi una media de 3.351463 seconds pero con solo paralelizar el bucle for con la
+  siguiente sentencia (#pragma omp parallel for) el tiempo se reduce a  0.608007
+  seconds.
 
 ************
 * SESIÓN 2 *
