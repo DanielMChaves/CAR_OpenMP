@@ -226,3 +226,93 @@ Fichero "fibonacci.c"
 ************
 *  EXTRA   *
 ************
+
+Partimos del programa original que trabaja en modo secuencial que nos da los
+siguientes resultados:
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    filtRec, nF=0
+    filtRec, nF=1
+    filtRec, nF=2
+    filtRec, nF=3
+    filtRec, nF=4
+    filtRec, nF=5
+    filtRec, nF=6
+    filtRec, nF=7
+    filtRec, nF=8
+    filtRec, nF=9
+    Llamada a filtRec: 1130.4 ms
+    Resultado (nFilt)=10
+
+Realizando las siguientes modificaciones:
+
+    #pragma omp parallel for
+    for (i=0; i<h; i++)
+      for (j=0; j<w; j++)
+        *(im_o->imagen+i*w+j) = FilPixel(im_i, i, j, MF);
+
+    difes = 0;
+    #pragma omp parallel for reduction(+:difes)
+    for (i=0; i<h; i++) {
+      for (j=0; j<w; j++) {
+        desp = i*w + j;
+        difes += abs(*(i1->imagen + desp) - *(i2->imagen + desp));
+      }
+      //fprintf(stdout, "difes(i=%d): %d\n", i, difes);
+    }
+
+Con las siguientes configuraciones se obtienen los siguientes resultados:
+
+    # export OMP_NUM_THREADS=8
+    # export OMP_SCHEDULE=guided,100
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    Llamada a filtRec: 5143.9 ms
+    Resultado (nFilt)=10
+
+    # export OMP_NUM_THREADS=4
+    # export OMP_SCHEDULE=static
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    Llamada a filtRec: 5513.3 ms
+    Resultado (nFilt)=10
+
+    # export OMP_NUM_THREADS=2
+    # export OMP_SCHEDULE=static
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    Llamada a filtRec: 2174.4 ms
+    Resultado (nFilt)=10
+
+    # export OMP_NUM_THREADS=2
+    # export OMP_SCHEDULE=dynamic
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    Llamada a filtRec: 2187.2 ms
+    Resultado (nFilt)=10
+
+    # export OMP_NUM_THREADS=2
+    # export OMP_SCHEDULE=guided
+
+    Fichero con imagen inicial: Im1_IronMan.png
+    Llamada a filtRec: 2208.6 ms
+    Resultado (nFilt)=10
+
+Al hacerse un gran número de llamadas a dichas subrutinas donde se encuentran
+los bucles papalelizados, se pierde mucha cantidad de tiempo a la hora de crear
+los hilos para dicha paralelización.
+
+Por esta razón, cada vez que reducimos el número de hilos a usar, el tiempo es
+cada vez más bajo por esto ultimo que he comentado.
+
+Por tanto, habría que ver otra manera de paralelizar el programa para no tener
+dicha desventaja.
+
+
+
+
+
+
+
+
+.

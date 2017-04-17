@@ -19,6 +19,7 @@
 #include <png.h>
 #include <string.h>
 #include <stdlib.h>
+#include <omp.h>
 
 #include "img_ng.h"
 #include "readpng.h"
@@ -59,7 +60,7 @@ void leeImagenOriginal_ng(char *nomImagen)
     display_exponent = atof(p);
   else
     display_exponent = default_display_exponent;
-  
+
   if (!(infile = fopen(filename, "rb"))) {
     fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
   } else {
@@ -108,10 +109,10 @@ void leeImagenOriginal_ng(char *nomImagen)
       ImLeida.channels = channels;
       ImLeida.rowbytes = rowbytes;
       ImLeida.imagen = image_data;
-      
+
       readpng_cleanup(FALSE);
       fclose(infile);
-      
+
       if (!image_data) {
 	fprintf(stderr, PROGNAME ":  unable to decode PNG image\n");
 	Original = NULL;
@@ -121,7 +122,7 @@ void leeImagenOriginal_ng(char *nomImagen)
       }
     }
   }
-  
+
   return;
 }
 
@@ -131,7 +132,7 @@ void escribeImagenOriginal_ng(tImagen * Im, char *nomImagen)
   (void) writeImage(nomImagen, Im->width, Im->height, Im->channels, Im->imagen);
 
   return;
-  
+
 }
 
 static tImagen * RGBaGris(tImagen *im, tImagen *Resul)
@@ -202,7 +203,7 @@ int ejecutaPPAL(void)
   gettimeofday(&tv_end, NULL);
 
   escribeImagenOriginal_ng(ImGris, "Im3_Final.png");
- 
+
   tiempo_trans=(tv_end.tv_sec - tv_start.tv_sec) * 10000 +
     (tv_end.tv_usec - tv_start.tv_usec)/100; //en 1/10 milisegundos
   printf("Llamada a filtRec: %.1f ms\n", tiempo_trans/10);
@@ -214,7 +215,7 @@ int ejecutaPPAL(void)
   free(Original->imagen);
   free(Original);
   Original = NULL;
-  
+
   return nFiltrados;
 }
 
@@ -234,7 +235,7 @@ int filtRec(tImagen *im_in, mFiltro_t *MF, int nCambios, int nFiltrados)
   imFiltrada->imagen = Ipix;
 
   fprintf(stdout, "filtRec, nF=%d\n", nFiltrados);
-  
+
   Filtro(im_in, imFiltrada, MF);
 
   if (++nF < MAX_RECURS) {
@@ -267,7 +268,7 @@ int filtRec(tImagen *im_in, mFiltro_t *MF, int nCambios, int nFiltrados)
   imFiltrada->imagen = Ipix;
 
   fprintf(stdout, "filtRec, nF=%d\n", nFiltrados);
-  
+
   Filtro(im_in, imFiltrada, MF);
 
   if (++nF < MAX_RECURS) {
@@ -280,7 +281,7 @@ int filtRec(tImagen *im_in, mFiltro_t *MF, int nCambios, int nFiltrados)
 
   free(imFiltrada->imagen);
   free(imFiltrada);
-       
+
   return nF;
 }
 
@@ -288,7 +289,7 @@ int filtRec(tImagen *im_in, mFiltro_t *MF, int nCambios, int nFiltrados)
 
 void Filtro(tImagen *im_i, tImagen *im_o, mFiltro_t *MF)
 {
-  
+
   int w = im_i->width;
   int h = im_i->height;
   int i, j;
@@ -298,10 +299,11 @@ void Filtro(tImagen *im_i, tImagen *im_o, mFiltro_t *MF)
   *im_o = *im_i;
   im_o->imagen = dirima;
 
+  #pragma omp parallel for
   for (i=0; i<h; i++)
     for (j=0; j<w; j++)
       *(im_o->imagen+i*w+j) = FilPixel(im_i, i, j, MF);
-  
+
   return;
 }
 
@@ -323,7 +325,7 @@ void SubMatriz(tImagen *im, uchar *subimg, int i, int j)
   int h = im->height;
   int ii, jj;
   uchar pix, *so=subimg, *si=im->imagen;
-  
+
   if ((i==0) || (j==0) || (i==(h-1)) || (j==(w-1))) {
     pix = *(im->imagen + i*w + j);
     for (ii=0; ii<9; ii++)
@@ -344,7 +346,7 @@ void SubMatriz(tImagen *im, uchar *subimg, int i, int j)
     *so++ = *si++;
     *so++ = *si++;
   }
-  
+
   return;
 }
 
@@ -389,7 +391,7 @@ uchar valorPixel(uchar *s_img, mFiltro_t *MF)
 
   p *= b;
   p += *q * c;
-  
+
   p /= MF->K;
 #endif
 
@@ -411,12 +413,13 @@ int Comp(tImagen *i1, tImagen *i2)
   int difes;
 
   difes = 0;
+  #pragma omp parallel for reduction(+:difes)
   for (i=0; i<h; i++) {
     for (j=0; j<w; j++) {
       desp = i*w + j;
       difes += abs(*(i1->imagen + desp) - *(i2->imagen + desp));
     }
-    //    fprintf(stdout, "difes(i=%d): %d\n", i, difes);
+    //fprintf(stdout, "difes(i=%d): %d\n", i, difes);
   }
   return difes;
 }

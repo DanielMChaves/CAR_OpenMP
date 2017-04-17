@@ -2,8 +2,8 @@
 # CC     = gcc
 CC     = /opt/intel/bin/icc
 
-CFLAGS = -Wall -g -O0
-# CFLAGS = -Wall -g -O2
+# CFLAGS = -Wall -g -O0
+CFLAGS = -qopenmp -Wall -g -O2
 # CFLAGS = -Wall -g -O3 -fno-inline
 
 LIBS   = -lm -lpng12 -lz
